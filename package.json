@@ -1,0 +1,37 @@
+{
+  "name": "onedeck",
+  "version": "0.1.8",
+  "description": "onedeck - a front-end microseeding development framework",
+  "main": "onedeck.js",
+  "scripts": {
+    "build": "webpack --mode production",
+    "build:dev": "webpack --mode development",
+    "doc": "jsdoc -c jsdoc.conf.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gyk007/ondeck"
+  },
+  "keywords": [
+    "microservices",
+    "frontend",
+    "onedeck",
+    "onedeck",
+    "micro-frontends"
+  ],
+  "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/preset-env": "^7.5.5",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^8.0.6",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.11.0",
+    "jsdoc": "^3.6.4"
+  },
+  "author": "Andrey Zhuk <gyk088@gmail.com>",
+  "license": "ISC",
+  "homepage": "https://github.com/gyk007/ondeck"
+}

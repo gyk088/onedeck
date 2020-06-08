@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Home</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Home</h1>
+
+    
+
+
+
+    
+
+
+    <h3> </h3>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    <section>
+        <article><h1>ONEDECK (Микросервисный фронтенд)</h1>
+<p>Фреймвор ONEDECK позволяет легко писать микросервисы во фронтенде.
+В рамках данного фреймворка микросервис для фронтенда назывется модуль.</p>
+<h2>Модуль (микросервис, фрагмент)</h2>
+<p>Модуль - независимая, логически законченая еденица приложения, которая инкапсулирует в себе всю логику.</p>
+<ul>
+<li>
+<p>Может быть написан c помощью любого фреймворка (<a href="https://vuejs.org/">Vue</a>, <a href="https://reactjs.org/">React</a>, <a href="https://angular.io/">Angular</a>, <a href="https://webix.com/">Webix</a> ... );</p>
+</li>
+<li>
+<p>Можно легко собрать отдельно от всего приложения;</p>
+</li>
+<li>
+<p>Динамически импортируется;</p>
+</li>
+</ul>
+<h2>Виды модулей</h2>
+<p>Все модули за исключением Root модуля наследуются от базового класса <code>onedeck.Module</code>.
+Root модуль наследуется от базового класса <code>onedeck.RootModule</code>.</p>
+<ul>
+<li><strong>Root Module</strong> Главный модуль приложения. Инициализируется один раз при старте приложения и инициализирует все модули приложения. Все модули общаются между собой через Root модуль с помощью событий. Реализует паттерн <a href="https://refactoring.guru/ru/design-patterns/mediator">Медиатор</a>.</li>
+<li><strong>Page Module</strong> Модуль страницы. Инициализируется при переходе на страницу модуля. Каждый модуль страницы соответствует конкретному url адресу. Может встраиваться в модуль макета (Layout module) и содержать в себе встраиваемые модули (Embed Module)</li>
+<li><strong>Global Module</strong> Глобальный модуль (глобальные модальные окна, нотификации). Инициализируется один раз при старте приложения. Может вызываться из любой точки приложения. Может содержать в себе Embed модули.</li>
+<li><strong>Layout Module</strong> Модуль макета (header, footer).  Инициализируется при переходе на страницу, если еще не был проинициализирован на предыдущей странице. Представляет собой контейнер для встраивания Page модуля и для встраивания Embed модулей страницы.</li>
+<li><strong>Embed Module</strong> Встраиваемый модуль. Инициализируется при переходе на страницу модуля Page либо при инициализации Global модуля. Представляет собой логически законченную часть, которая может быть встроена в различные модули приложения.</li>
+</ul>
+<h2>Пример внутреннего устройства</h2>
+<pre class="prettyprint source"><code>|--project_name_dir
+    |--src
+        |--modules
+            |--Root
+                |--root.js
+                ...
+            |--Module1
+                |--module.js
+                ...
+            |--Module2
+                |--module.js
+                ...
+            ...
+</code></pre>
+<p>Имя модуля начинается с заглавной буквы. Название директории модуля должно соотвествовать названию модуля.</p>
+<h2>Конфигурация приложения</h2>
+<p>При старте приложнеия приосиходит инициализация модуля Root, который в свою очередь динамически импортирует необходимые модули и инициализирует их.</p>
+<h4>Старт приложения (index.js):</h4>
+<pre class="prettyprint source"><code>import Config from './conf';
+new Config.rootModule(Config);
+</code></pre>
+<h4>Конфиг файл</h4>
+<pre class="prettyprint source"><code>import Root from 'Root/module';
+
+export default {
+  // роутинг с помощю history Api  или hash
+  historyApi: false,
+  // корневой путь для приложения ('/example/path/')
+  rootPath: '/',
+  // класс Root модуля
+  rootModule: Root,
+  // название модуля главной страницы
+  mainModule: 'main',
+  // названия модуля старницы 404
+  module404: 'notfound',
+  // функция для динамического импорта модуля
+  // module - название модуля и название директории модуля
+  import: async (module) => await import(`./modules/${module}/module`),
+  modules: {
+    auth: {
+      module: 'ExampleAuth',
+    },
+    main: {
+      layout: 'ExampleLayoutWebix',
+      module: 'ExampleWebix',
+      embed: {
+        example: {
+          module: 'ExampleEmbed',
+        },
+      },
+    },
+    notfound: {
+      layout: 'ExampleLayoutWebix',
+      module: 'ExampleError404',
+    },
+    globalwnd: {
+      global: true,
+      module: 'ExampleGlobalWnd',
+      embed: {
+        example: {
+          module: 'ExampleEmbedGlobal',
+        },
+      },
+    },
+    globalnotification: {
+      global: true,
+      module: 'ExampleNotification',
+    },
+  },
+};
+</code></pre>
+<p>Конфигурация может содеражть любые поля, в зваисимости от необходимости.</p>
+<h5>Обязательные поля конфигурации приложения</h5>
+<ul>
+<li><strong><code>historyApi: Bool</code></strong> - вид роутинга в приложении</li>
+<li><strong><code>rootPath: String</code></strong> - начальный роут. Если наше приложение стартует от пути <code>http://localhost:3000/example/path/</code> - в <code>rootPath</code> необходимо указать <code>/example/path/</code>;</li>
+<li><strong><code>rootModule: Class</code></strong> - класс Root модуля</li>
+<li><strong><code>mainModule: String</code></strong> - название модуля главной старницы</li>
+<li><strong><code>module404: String</code></strong> - название модуля старницы 404</li>
+<li><strong><code>import: Function</code></strong> - ассинхронная функция котора динамически импортирует все модули</li>
+<li><strong><code>modules: Object</code></strong> - объект который содержит насторйки всех модулей</li>
+</ul>
+<h5>Конфигурация модуля</h5>
+<pre class="prettyprint source"><code>main: {
+  layout: 'ExampleLayoutWebix',
+  module: 'ExampleWebix',
+  embed: {
+    example: {
+      module: 'ExampleEmbed',
+    },
+  },
+},
+</code></pre>
+<p>Конфигурация модуля может содержать любые поля, в зваисимости от необходимости.</p>
+<ul>
+<li><strong>ключ объекта конфигурации <code>main</code></strong>- название модуля, и данное название соответсвует url модуля <code>http://localhost:3000/main/</code></li>
+<li><strong><code>module: String</code></strong> - Обязательное поле. Содержит название модуля. Модуль должен находиться в директории с соответсвующим названием.</li>
+<li><strong><code>layout: String</code></strong> - Необязательное поле. Содержит название модуля Layout. Модуль должен находиться в директории с соответсвующим названием.</li>
+<li><strong><code>embed: Object</code></strong> - Необязательное поле. Содержит Embed модули. Модуль должен находиться в директории с соответсвующим названием, которое указано в поле  <code>module</code> .</li>
+</ul></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Module.html">Module</a></li><li><a href="module-Observable.html">Observable</a></li><li><a href="module-RootModule.html">RootModule</a></li></ul><h3>Classes</h3><ul><li><a href="module.exports.html">RootModule</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Tue Jun 09 2020 00:07:21 GMT+0300 (GMT+03:00)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
