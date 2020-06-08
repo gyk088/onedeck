@@ -38,10 +38,10 @@
     <div class="container-overview">
     
         
-            <div class="description"><p>Класс является родителем для всех модуле кроме главного модуля (Root Module). </br>
+            <div class="description"><p>Класс является родителем для всех модулей кроме главного модуля (Root Module). </br>
 Наследуется от класса Observable для реализации паттерна <a href="https://refactoring.guru/ru/design-patterns/observer">Наблюдатель (Observer)</a>. </br>
 Объект модуля реализует паттерн <a href="https://refactoring.guru/ru/design-patterns/singleton">Одиночка (Singleton)</a>. </br>
-Кадый модуль создается только 1 раз, последующий вызов new Module() - вернет текущий экзепляр данного класса.</p></div>
+Каждый модуль создается только 1 раз, последующий вызов new Module() - вернет текущий экзепляр данного класса.</p></div>
         
 
         
@@ -90,7 +90,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="module.js.html">module.js</a>, <a href="module.js.html#line3">line 3</a>
+        <a href="module.js.html">module.js</a>, <a href="module.js.html#line4">line 4</a>
     </li></ul></dd>
     
 
@@ -173,8 +173,10 @@ module.$$gemit('eventName', data)</code></pre>
 
 
 <div class="description">
-    <p>this method must be overridden by sub class.
-unsubscribes from module events and deletes all objects for cleans the DOM tree</p>
+    <p>Абстрактный метод. Деструктор. </br>
+В этом методе должна быть описана деструктуризация модуля. </br>
+Метод автоматически вызывается для каждого модуля старницы при переходе на другую старницу приложнеия. </br>
+Для Global модуля - дестуркторизация не производится. </br></p>
 </div>
 
 
@@ -218,7 +220,7 @@ unsubscribes from module events and deletes all objects for cleans the DOM tree<
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="module.js.html">module.js</a>, <a href="module.js.html#line65">line 65</a>
+        <a href="module.js.html">module.js</a>, <a href="module.js.html#line95">line 95</a>
     </li></ul></dd>
     
 
@@ -247,6 +249,16 @@ unsubscribes from module events and deletes all objects for cleans the DOM tree<
 
 
 
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>destroy () {
+  // Отписываемся от всех событий уровня модуля
+  this.$$offAll()
+
+  ReactDOM.unmountComponentAtNode(document.getElementById('MainContent'));
+}</code></pre>
+
+
 
         
             
@@ -262,8 +274,17 @@ unsubscribes from module events and deletes all objects for cleans the DOM tree<
 
 
 <div class="description">
-    <p>this method must be overridden by sub class.
-performs various actions depending on the argument</p>
+    <p>Абстрактный метод. Диспетчер. </br>
+В этом методе должна быть описана логика модуля связанная с маршрутизацией. </br>
+Метод автоматически вызывается для каждого модуля при изменении url адреса. </br>
+Вызывается в следующем порядке: </br></p>
+<ul>
+<li>dispatcher Root модуля </br></li>
+<li>dispatcher всех Global модулей в произвольном порядке</br></li>
+<li>dispatcher Layout модуля </br></li>
+<li>dispatcher Page модуля </br></li>
+<li>dispatcher Embed модулей в произвольном порядке </br></li>
+</ul>
 </div>
 
 
@@ -315,7 +336,7 @@ performs various actions depending on the argument</p>
 
             
 
-            <td class="description last"><p>url.</p></td>
+            <td class="description last"><p>массив с элементами url адреса.</p></td>
         </tr>
 
     
@@ -338,7 +359,7 @@ performs various actions depending on the argument</p>
 
             
 
-            <td class="description last"><p>current state.</p></td>
+            <td class="description last"><p>данные переданные с url.</p></td>
         </tr>
 
     
@@ -379,7 +400,7 @@ performs various actions depending on the argument</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="module.js.html">module.js</a>, <a href="module.js.html#line74">line 74</a>
+        <a href="module.js.html">module.js</a>, <a href="module.js.html#line119">line 119</a>
     </li></ul></dd>
     
 
@@ -406,6 +427,15 @@ performs various actions depending on the argument</p>
 
 
 
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>dispatcher (path, state) {
+  console.log('dispatcher', this.constructor.name, path, state);
+  // Если путь my.site.com/moduleName/item/3
+  if (path[1] === 'item') this.showItem(state, path[2]);
+}</code></pre>
 
 
 
@@ -468,7 +498,7 @@ performs various actions depending on the argument</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="module.js.html">module.js</a>, <a href="module.js.html#line48">line 48</a>
+        <a href="module.js.html">module.js</a>, <a href="module.js.html#line53">line 53</a>
     </li></ul></dd>
     
 
@@ -500,8 +530,10 @@ performs various actions depending on the argument</p>
     <h5>Example</h5>
     
     <pre class="prettyprint"><code>eventHandler () {
-  this.$on('event1', () => this.$$gemit(this.SomethingData1));
-  this.$on('event2', () => this.doSomething(this.SomethingData2));
+  // Cоздаем событие уровня модуля в котором эмитим событие уровня приложения
+  this.$on('event1', (data) => this.$$gemit(data));
+  // Cоздаем событие уровня модуля в котором выполняем метод doSomething
+  this.$on('event2', (data) => this.doSomething(data));
 }</code></pre>
 
 
@@ -520,9 +552,16 @@ performs various actions depending on the argument</p>
 
 
 <div class="description">
-    <p>this method must be overridden by sub class.
-initializes the module
-should call eventHandler and dispatcher</p>
+    <p>Абстрактный метод. Инициализация приложения модуля. </br>
+В этом методе должна быть описана инициализация приложения модуля. </br>
+Метод автоматически вызывается для каждого модуля старницы при переходе на страницу модуля. </br>
+Для Global модуля, и для Embed модулей которые встороенные в Global - вызыввается только 1 раз, при инициализации приложения. </br>
+Вызывается в следующем порядке: </br></p>
+<ul>
+<li>init Layout модуля если на старнице меняется Layout </br></li>
+<li>init Page модуля </br></li>
+<li>init Embed модулей в произвольном порядке </br></li>
+</ul>
 </div>
 
 
@@ -564,7 +603,7 @@ should call eventHandler and dispatcher</p>
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">Array</span>
 
 
             
@@ -574,7 +613,7 @@ should call eventHandler and dispatcher</p>
 
             
 
-            <td class="description last"><p>url.</p></td>
+            <td class="description last"><p>массив с элементами url адреса.</p></td>
         </tr>
 
     
@@ -597,7 +636,7 @@ should call eventHandler and dispatcher</p>
 
             
 
-            <td class="description last"><p>current state.</p></td>
+            <td class="description last"><p>данные переданные с url.</p></td>
         </tr>
 
     
@@ -638,7 +677,7 @@ should call eventHandler and dispatcher</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="module.js.html">module.js</a>, <a href="module.js.html#line58">line 58</a>
+        <a href="module.js.html">module.js</a>, <a href="module.js.html#line78">line 78</a>
     </li></ul></dd>
     
 
@@ -667,6 +706,17 @@ should call eventHandler and dispatcher</p>
 
 
 
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>init (path, state) {
+  console.log('init', this.constructor.name, path, state);
+  // Создаем приложение модуля
+  this.reactApp = ReactDOM.render(&lt;App />, document.getElementById('MainContent'));
+  // Вызываем обработчик событий
+  this.eventHandler();
+}</code></pre>
+
+
 
         
             
@@ -682,11 +732,17 @@ should call eventHandler and dispatcher</p>
 
 
 <div class="description">
-    <p>Called immediately after mounting
-child module to the root module
-The method must be overridden in the Root module.</p>
-<p>метод жиненого цикла , вызывается после того как модуль смотнирован,
-в этом методе доступен объект currentModule и currentModule</p>
+    <p>Абстрактный метод. Монитирование модуля. </br>
+Метод автоматически вызывается для каждого модуля при изменении url адреса. </br>
+В методе доступны объекты currentModule и currentLayout. </br>
+Вызывается в следующем порядке: </br></p>
+<ul>
+<li>mounted Root модуля </br></li>
+<li>mounted всех Global модулей в произвольном порядке </br></li>
+<li>mounted Layout модуля </br></li>
+<li>mounted Page модуля </br></li>
+<li>mounted Embed модулей в произвольном порядке </br></li>
+</ul>
 </div>
 
 
@@ -738,7 +794,7 @@ The method must be overridden in the Root module.</p>
 
             
 
-            <td class="description last"><p>текущий модуль.</p></td>
+            <td class="description last"><p>текущий Page модуль.</p></td>
         </tr>
 
     
@@ -761,7 +817,7 @@ The method must be overridden in the Root module.</p>
 
             
 
-            <td class="description last"><p>текущий макет.</p></td>
+            <td class="description last"><p>текущий Layout модуль.</p></td>
         </tr>
 
     
@@ -802,7 +858,7 @@ The method must be overridden in the Root module.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="module.js.html">module.js</a>, <a href="module.js.html#line87">line 87</a>
+        <a href="module.js.html">module.js</a>, <a href="module.js.html#line140">line 140</a>
     </li></ul></dd>
     
 
@@ -831,6 +887,13 @@ The method must be overridden in the Root module.</p>
 
 
 
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>mounted (module, layout) {
+  console.log('mounted', this.constructor.name, module, layout);
+}</code></pre>
+
+
 
         
     
@@ -848,13 +911,13 @@ The method must be overridden in the Root module.</p>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Module.html">Module</a></li><li><a href="module-Observable.html">Observable</a></li><li><a href="module-RootModule.html">RootModule</a></li></ul><h3>Classes</h3><ul><li><a href="module.exports.html">RootModule</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Module.html">Module</a></li><li><a href="module-Observable.html">Observable</a></li><li><a href="module-RootModule.html">RootModule</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Tue Jun 09 2020 00:07:21 GMT+0300 (GMT+03:00)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Tue Jun 09 2020 01:51:33 GMT+0300 (GMT+03:00)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -1,4 +1,5 @@
 import Observable from './observ';
+
 export default class Module extends Observable {
   /**
    * Класс является родителем для всех модулей кроме главного модуля (Root Module). </br>
@@ -25,6 +26,7 @@ export default class Module extends Observable {
     /**
      * Объект содержит в себе инстансы всех моулей
      * Модуль создается только 1 раз
+     * @static
      */
     Module.instances = Module.instances || {};
 
@@ -38,7 +40,7 @@ export default class Module extends Observable {
   /**
    * Абстрактный метод. Обработчик событий. </br>
    * В этом методе должны быть описаны все события текущего моудля. </br>
-   * @abstract
+   *
    * @example
    * eventHandler () {
    *   // Cоздаем событие уровня модуля в котором эмитим событие уровня приложения
@@ -46,6 +48,7 @@ export default class Module extends Observable {
    *   // Cоздаем событие уровня модуля в котором выполняем метод doSomething
    *   this.$on('event2', (data) => this.doSomething(data));
    * }
+   * @abstract
    */
   eventHandler () { }
 
@@ -53,7 +56,7 @@ export default class Module extends Observable {
    * Абстрактный метод. Инициализация приложения модуля. </br>
    * В этом методе должна быть описана инициализация приложения модуля. </br>
    * Метод автоматически вызывается для каждого модуля старницы при переходе на страницу модуля. </br>
-   * Для Global модуля - вызыввается только 1 раз, при инициализации приложения. </br>
+   * Для Global модуля, и для Embed модулей которые встороенные в Global - вызыввается только 1 раз, при инициализации приложения. </br>
    * Вызывается в следующем порядке: </br>
    * - init Layout модуля если на старнице меняется Layout </br>
    * - init Page модуля </br>
@@ -69,7 +72,7 @@ export default class Module extends Observable {
    * }
    *
    * @param {Array} path - массив с элементами url адреса.
-   * @param {Object} state - current state.
+   * @param {Object} state - данные переданные с url.
    * @abstract
    */
   init () { }
@@ -81,35 +84,57 @@ export default class Module extends Observable {
    * Для Global модуля - дестуркторизация не производится. </br>
    *
    * @example
-   * init (path, state) {
-   *   console.log('init', this.constructor.name, path, state);
-   *   // Создаем приложение модуля
-   *   this.reactApp = ReactDOM.render(<App />, document.getElementById('MainContent'));
-   *   // Вызываем обработчик событий
-   *   this.eventHandler();
+   * destroy () {
+   *   // Отписываемся от всех событий уровня модуля
+   *   this.$$offAll()
+   *
+   *   ReactDOM.unmountComponentAtNode(document.getElementById('MainContent'));
    * }
    * @abstract
    */
   destroy () { }
 
   /**
-   * this method must be overridden by sub class.
-   * performs various actions depending on the argument
-   * @param {string} path - url.
-   * @param {Object} state - current state.
+   * Абстрактный метод. Диспетчер. </br>
+   * В этом методе должна быть описана логика модуля связанная с маршрутизацией. </br>
+   * Метод автоматически вызывается для каждого модуля при изменении url адреса. </br>
+   * Вызывается в следующем порядке: </br>
+   * - dispatcher Root модуля </br>
+   * - dispatcher всех Global модулей в произвольном порядке</br>
+   * - dispatcher Layout модуля </br>
+   * - dispatcher Page модуля </br>
+   * - dispatcher Embed модулей в произвольном порядке </br>
+   *
+   * @example
+   * dispatcher (path, state) {
+   *   console.log('dispatcher', this.constructor.name, path, state);
+   *   // Если путь my.site.com/moduleName/item/3
+   *   if (path[1] === 'item') this.showItem(state, path[2]);
+   * }
+   *
+   * @param {string} path - массив с элементами url адреса.
+   * @param {Object} state - данные переданные с url.
    * @abstract
    */
   dispatcher () { }
 
   /**
-  * Called immediately after mounting
-  * child module to the root module
-  * The method must be overridden in the Root module.
+  * Абстрактный метод. Монитирование модуля. </br>
+  * Метод автоматически вызывается для каждого модуля при изменении url адреса. </br>
+  * В методе доступны объекты currentModule и currentLayout. </br>
+  * Вызывается в следующем порядке: </br>
+  * - mounted Root модуля </br>
+  * - mounted всех Global модулей в произвольном порядке </br>
+  * - mounted Layout модуля </br>
+  * - mounted Page модуля </br>
+  * - mounted Embed модулей в произвольном порядке </br>
+  * @example
+  * mounted (module, layout) {
+  *   console.log('mounted', this.constructor.name, module, layout);
+  * }
   *
-  * метод жиненого цикла , вызывается после того как модуль смотнирован,
-  * в этом методе доступен объект currentModule и currentModule
-  * @param {Object} currentModule - текущий модуль.
-  * @param {Object} currentLayout - текущий макет.
+  * @param {Object} currentModule - текущий Page модуль.
+  * @param {Object} currentLayout - текущий Layout модуль.
   * @abstract
   */
   mounted () { }

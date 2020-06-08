@@ -56,6 +56,55 @@
 
 
 
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>config</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>конфиг приложения (пример конфига в README.md)</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
 
 
 
@@ -89,7 +138,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line8">line 8</a>
+        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line4">line 4</a>
     </li></ul></dd>
     
 
@@ -116,6 +165,13 @@
 
 
 
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>import Onedeck from 'onedeck';
+
+export default class Root extends Onedeck.RootModule { ... }</code></pre>
 
 
 
@@ -315,7 +371,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line117">line 117</a>
+        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line167">line 167</a>
     </li></ul></dd>
     
 
@@ -404,7 +460,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line192">line 192</a>
+        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line242">line 242</a>
     </li></ul></dd>
     
 
@@ -493,7 +549,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line177">line 177</a>
+        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line227">line 227</a>
     </li></ul></dd>
     
 
@@ -654,7 +710,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line205">line 205</a>
+        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line255">line 255</a>
     </li></ul></dd>
     
 
@@ -743,7 +799,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line340">line 340</a>
+        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line390">line 390</a>
     </li></ul></dd>
     
 
@@ -881,7 +937,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line233">line 233</a>
+        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line283">line 283</a>
     </li></ul></dd>
     
 
@@ -973,7 +1029,7 @@ The method must be overridden in the Root module.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line145">line 145</a>
+        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line195">line 195</a>
     </li></ul></dd>
     
 
@@ -1017,8 +1073,17 @@ The method must be overridden in the Root module.</p>
 
 
 <div class="description">
-    <p>this method must be overridden by sub class.
-performs various actions depending on the argument</p>
+    <p>Абстрактный метод. Диспетчер. </br>
+В этом методе должна быть описана логика модуля связанная с маршрутизацией. </br>
+Метод автоматически вызывается для каждого модуля при изменении url адреса. </br>
+Вызывается в следующем порядке: </br></p>
+<ul>
+<li>dispatcher Root модуля </br></li>
+<li>dispatcher всех Global модулей в произвольном порядке</br></li>
+<li>dispatcher Layout модуля </br></li>
+<li>dispatcher Page модуля </br></li>
+<li>dispatcher Embed модулей в произвольном порядке </br></li>
+</ul>
 </div>
 
 
@@ -1070,7 +1135,7 @@ performs various actions depending on the argument</p>
 
             
 
-            <td class="description last"><p>url.</p></td>
+            <td class="description last"><p>массив с элементами url адреса.</p></td>
         </tr>
 
     
@@ -1093,7 +1158,7 @@ performs various actions depending on the argument</p>
 
             
 
-            <td class="description last"><p>current state.</p></td>
+            <td class="description last"><p>данные переданные с url.</p></td>
         </tr>
 
     
@@ -1134,7 +1199,7 @@ performs various actions depending on the argument</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line110">line 110</a>
+        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line160">line 160</a>
     </li></ul></dd>
     
 
@@ -1163,6 +1228,15 @@ performs various actions depending on the argument</p>
 
 
 
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>dispatcher (path, state) {
+  console.log('dispatcher', this.constructor.name, path, state);
+  // Если путь my.site.com/moduleName/item/3
+  if (path[1] === 'item') this.showItem(state, path[2]);
+}</code></pre>
+
+
 
         
             
@@ -1178,10 +1252,8 @@ performs various actions depending on the argument</p>
 
 
 <div class="description">
-    <p>this method must be overridden by sub class.
-should contain all events</p>
-<p>Обработчик событий.
-Должен быть переопределен в модуле Root.</p>
+    <p>Абстрактный метод. Обработчик событий. </br>
+В этом методе должны быть описаны все события уровня приложения, которые будут доступны в каждом модуле. </br></p>
 </div>
 
 
@@ -1225,7 +1297,7 @@ should contain all events</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line90">line 90</a>
+        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line115">line 115</a>
     </li></ul></dd>
     
 
@@ -1254,6 +1326,29 @@ should contain all events</p>
 
 
 
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>eventHandler () {
+ // Обработка ошибок http запросов
+ axios.interceptors.response.use(undefined, (error) => {
+    this.ajaxError(error.response.data);
+    return Promise.reject(error);
+ });
+
+ // Событие открывает окно
+ this.$$on('showGlobalWnd', () => {
+   const wnd = new ExampleGlobalWnd();
+   wnd.show();
+ });
+
+ // Событие показывает уведомление
+ this.$$on('notify', (text) => {
+   const notifyObj = new ExampleNotification();
+   notifyObj.notify(text);
+ });
+}</code></pre>
+
+
 
         
             
@@ -1269,10 +1364,9 @@ should contain all events</p>
 
 
 <div class="description">
-    <p>this method must be overridden by sub class.
-should call eventHandler</p>
-<p>Метод инициализации главного модуля.
-Должен быть переопределен в модуле Root.</p>
+    <p>Абстрактный метод. Инициализация приложения. </br>
+В этом методе должна быть описана инициализация приложения. </br>
+Метод вызывается 1 раз при инициализации всего приложения. </br></p>
 </div>
 
 
@@ -1437,7 +1531,7 @@ should call eventHandler</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line80">line 80</a>
+        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line86">line 86</a>
     </li></ul></dd>
     
 
@@ -1466,6 +1560,16 @@ should call eventHandler</p>
 
 
 
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>init (initObj) {
+  console.log('init', this.constructor.name, initObj);
+
+  // Вызываем обработчик событий
+  this.eventHandler();
+}</code></pre>
+
+
 
         
             
@@ -1473,7 +1577,7 @@ should call eventHandler</p>
     
 
     
-    <h4 class="name" id="mounted"><span class="type-signature">(abstract) </span>mounted<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="mounted"><span class="type-signature">(abstract) </span>mounted<span class="signature">(currentModule, currentLayout)</span><span class="type-signature"></span></h4>
     
 
     
@@ -1481,11 +1585,17 @@ should call eventHandler</p>
 
 
 <div class="description">
-    <p>Called immediately after mounting
-child module to the root module
-The method must be overridden in the Root module.</p>
-<p>метод жиненого цикла , вызывается после того как модуль смотнирован,
-в этом методе доступен объект currentModule</p>
+    <p>Абстрактный метод. Монитирование модуля. </br>
+Метод автоматически вызывается для каждого модуля при изменении url адреса. </br>
+В методе доступны объекты currentModule и currentLayout. </br>
+Вызывается в следующем порядке: </br></p>
+<ul>
+<li>mounted Root модуля </br></li>
+<li>mounted всех Global модулей в произвольном порядке </br></li>
+<li>mounted Layout модуля </br></li>
+<li>mounted Page модуля </br></li>
+<li>mounted Embed модулей в произвольном порядке </br></li>
+</ul>
 </div>
 
 
@@ -1494,6 +1604,78 @@ The method must be overridden in the Root module.</p>
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>currentModule</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>текущий Page модуль.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>currentLayout</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>текущий Layout модуль.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -1529,7 +1711,7 @@ The method must be overridden in the Root module.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line101">line 101</a>
+        <a href="root.module.js.html">root.module.js</a>, <a href="root.module.js.html#line136">line 136</a>
     </li></ul></dd>
     
 
@@ -1558,6 +1740,13 @@ The method must be overridden in the Root module.</p>
 
 
 
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>mounted (module, layout) {
+  console.log('mounted', this.constructor.name, module, layout);
+}</code></pre>
+
+
 
         
     
@@ -1575,13 +1764,13 @@ The method must be overridden in the Root module.</p>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Module.html">Module</a></li><li><a href="module-Observable.html">Observable</a></li><li><a href="module-RootModule.html">RootModule</a></li></ul><h3>Classes</h3><ul><li><a href="module.exports.html">RootModule</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Module.html">Module</a></li><li><a href="module-Observable.html">Observable</a></li><li><a href="module-RootModule.html">RootModule</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Tue Jun 09 2020 00:07:21 GMT+0300 (GMT+03:00)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Tue Jun 09 2020 01:51:33 GMT+0300 (GMT+03:00)
 </footer>
 
 <script> prettyPrint(); </script>

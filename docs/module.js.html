@@ -27,12 +27,13 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>import Observable from './observ';
+
 export default class Module extends Observable {
   /**
-   * Класс является родителем для всех модуле кроме главного модуля (Root Module). &lt;/br>
+   * Класс является родителем для всех модулей кроме главного модуля (Root Module). &lt;/br>
    * Наследуется от класса Observable для реализации паттерна [Наблюдатель (Observer)]{@link https://refactoring.guru/ru/design-patterns/observer}. &lt;/br>
    * Объект модуля реализует паттерн [Одиночка (Singleton)]{@link https://refactoring.guru/ru/design-patterns/singleton}. &lt;/br>
-   * Кадый модуль создается только 1 раз, последующий вызов new Module() - вернет текущий экзепляр данного класса.
+   * Каждый модуль создается только 1 раз, последующий вызов new Module() - вернет текущий экзепляр данного класса.
    * @example &lt;caption>Пример создания модуля&lt;/caption>
    * import Onedeck from 'onedeck';
    *
@@ -53,6 +54,7 @@ export default class Module extends Observable {
     /**
      * Объект содержит в себе инстансы всех моулей
      * Модуль создается только 1 раз
+     * @static
      */
     Module.instances = Module.instances || {};
 
@@ -66,50 +68,101 @@ export default class Module extends Observable {
   /**
    * Абстрактный метод. Обработчик событий. &lt;/br>
    * В этом методе должны быть описаны все события текущего моудля. &lt;/br>
-   * @abstract
+   *
    * @example
    * eventHandler () {
-   *   this.$on('event1', () => this.$$gemit(this.SomethingData1));
-   *   this.$on('event2', () => this.doSomething(this.SomethingData2));
+   *   // Cоздаем событие уровня модуля в котором эмитим событие уровня приложения
+   *   this.$on('event1', (data) => this.$$gemit(data));
+   *   // Cоздаем событие уровня модуля в котором выполняем метод doSomething
+   *   this.$on('event2', (data) => this.doSomething(data));
    * }
+   * @abstract
    */
   eventHandler () { }
 
   /**
-   * this method must be overridden by sub class.
-   * initializes the module
-   * should call eventHandler and dispatcher
-   * @param {string} path - url.
-   * @param {Object} state - current state.
+   * Абстрактный метод. Инициализация приложения модуля. &lt;/br>
+   * В этом методе должна быть описана инициализация приложения модуля. &lt;/br>
+   * Метод автоматически вызывается для каждого модуля старницы при переходе на страницу модуля. &lt;/br>
+   * Для Global модуля, и для Embed модулей которые встороенные в Global - вызыввается только 1 раз, при инициализации приложения. &lt;/br>
+   * Вызывается в следующем порядке: &lt;/br>
+   * - init Layout модуля если на старнице меняется Layout &lt;/br>
+   * - init Page модуля &lt;/br>
+   * - init Embed модулей в произвольном порядке &lt;/br>
+   *
+   * @example
+   * init (path, state) {
+   *   console.log('init', this.constructor.name, path, state);
+   *   // Создаем приложение модуля
+   *   this.reactApp = ReactDOM.render(&lt;App />, document.getElementById('MainContent'));
+   *   // Вызываем обработчик событий
+   *   this.eventHandler();
+   * }
+   *
+   * @param {Array} path - массив с элементами url адреса.
+   * @param {Object} state - данные переданные с url.
    * @abstract
    */
   init () { }
 
   /**
-   * this method must be overridden by sub class.
-   * unsubscribes from module events and deletes all objects for cleans the DOM tree
+   * Абстрактный метод. Деструктор. &lt;/br>
+   * В этом методе должна быть описана деструктуризация модуля. &lt;/br>
+   * Метод автоматически вызывается для каждого модуля старницы при переходе на другую старницу приложнеия. &lt;/br>
+   * Для Global модуля - дестуркторизация не производится. &lt;/br>
+   *
+   * @example
+   * destroy () {
+   *   // Отписываемся от всех событий уровня модуля
+   *   this.$$offAll()
+   *
+   *   ReactDOM.unmountComponentAtNode(document.getElementById('MainContent'));
+   * }
    * @abstract
    */
   destroy () { }
 
   /**
-   * this method must be overridden by sub class.
-   * performs various actions depending on the argument
-   * @param {string} path - url.
-   * @param {Object} state - current state.
+   * Абстрактный метод. Диспетчер. &lt;/br>
+   * В этом методе должна быть описана логика модуля связанная с маршрутизацией. &lt;/br>
+   * Метод автоматически вызывается для каждого модуля при изменении url адреса. &lt;/br>
+   * Вызывается в следующем порядке: &lt;/br>
+   * - dispatcher Root модуля &lt;/br>
+   * - dispatcher всех Global модулей в произвольном порядке&lt;/br>
+   * - dispatcher Layout модуля &lt;/br>
+   * - dispatcher Page модуля &lt;/br>
+   * - dispatcher Embed модулей в произвольном порядке &lt;/br>
+   *
+   * @example
+   * dispatcher (path, state) {
+   *   console.log('dispatcher', this.constructor.name, path, state);
+   *   // Если путь my.site.com/moduleName/item/3
+   *   if (path[1] === 'item') this.showItem(state, path[2]);
+   * }
+   *
+   * @param {string} path - массив с элементами url адреса.
+   * @param {Object} state - данные переданные с url.
    * @abstract
    */
   dispatcher () { }
 
   /**
-  * Called immediately after mounting
-  * child module to the root module
-  * The method must be overridden in the Root module.
+  * Абстрактный метод. Монитирование модуля. &lt;/br>
+  * Метод автоматически вызывается для каждого модуля при изменении url адреса. &lt;/br>
+  * В методе доступны объекты currentModule и currentLayout. &lt;/br>
+  * Вызывается в следующем порядке: &lt;/br>
+  * - mounted Root модуля &lt;/br>
+  * - mounted всех Global модулей в произвольном порядке &lt;/br>
+  * - mounted Layout модуля &lt;/br>
+  * - mounted Page модуля &lt;/br>
+  * - mounted Embed модулей в произвольном порядке &lt;/br>
+  * @example
+  * mounted (module, layout) {
+  *   console.log('mounted', this.constructor.name, module, layout);
+  * }
   *
-  * метод жиненого цикла , вызывается после того как модуль смотнирован,
-  * в этом методе доступен объект currentModule и currentModule
-  * @param {Object} currentModule - текущий модуль.
-  * @param {Object} currentLayout - текущий макет.
+  * @param {Object} currentModule - текущий Page модуль.
+  * @param {Object} currentLayout - текущий Layout модуль.
   * @abstract
   */
   mounted () { }
@@ -124,13 +177,13 @@ export default class Module extends Observable {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Module.html">Module</a></li><li><a href="module-Observable.html">Observable</a></li><li><a href="module-RootModule.html">RootModule</a></li></ul><h3>Classes</h3><ul><li><a href="module.exports.html">RootModule</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Module.html">Module</a></li><li><a href="module-Observable.html">Observable</a></li><li><a href="module-RootModule.html">RootModule</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Tue Jun 09 2020 00:07:21 GMT+0300 (GMT+03:00)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Tue Jun 09 2020 01:51:33 GMT+0300 (GMT+03:00)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -1,20 +1,18 @@
 import Observable from './observ';
-/**
- * this is the parent class for the main application module.
- * родительсикй класс для главного модуля приложения
- *
- */
+
 export default class RootModule extends Observable {
   /**
    * Класс является родителем для главного модуля (Root Module). </br>
    * Наследуется от класса Observable для реализации паттерна [Наблюдатель (Observer)]{@link https://refactoring.guru/ru/design-patterns/observer}. </br>
    * Объект Root модуля реализует паттерн [Посредник (Mediator)]{@link https://refactoring.guru/ru/design-patterns/mediator}. </br>
    * @Module RootModule
-   */
-  /**
    *
-   * конструктор
-   * @param {Object} config  config object
+   * @example
+   * import Onedeck from 'onedeck';
+   *
+   * export default class Root extends Onedeck.RootModule { ... }
+   *
+   * @param {Object} config - конфиг приложения (пример конфига в README.md)
    */
   constructor(config) {
     super();
@@ -67,44 +65,96 @@ export default class RootModule extends Observable {
   }
 
   /**
-   * this method must be overridden by sub class.
-   * should call eventHandler
+   * Абстрактный метод. Инициализация приложения. </br>
+   * В этом методе должна быть описана инициализация приложения. </br>
+   * Метод вызывается 1 раз при инициализации всего приложения. </br>
    *
-   * Метод инициализации главного модуля.
-   * Должен быть переопределен в модуле Root.
-   * @abstract
+   * @example
+   * init (initObj) {
+   *   console.log('init', this.constructor.name, initObj);
+   *
+   *   // Вызываем обработчик событий
+   *   this.eventHandler();
+   * }
+   *
+   *
    * @param {Object} initObj - объект инициализации приложения
    * @param {Array} initObj.module - массив с данными url адреса
    * @param {String} initObj.path - текущий урл
+   * @abstract
    */
   init () { }
 
   /**
-   * this method must be overridden by sub class.
-   * should contain all events
+   * Абстрактный метод. Обработчик событий. </br>
+   * В этом методе должны быть описаны все события уровня приложения, которые будут доступны в каждом модуле. </br>
    *
-   * Обработчик событий.
-   * Должен быть переопределен в модуле Root.
+   * @example
+   * eventHandler () {
+   *  // Обработка ошибок http запросов
+   *  axios.interceptors.response.use(undefined, (error) => {
+   *     this.ajaxError(error.response.data);
+   *     return Promise.reject(error);
+   *  });
+   *
+   *  // Событие открывает окно
+   *  this.$$on('showGlobalWnd', () => {
+   *    const wnd = new ExampleGlobalWnd();
+   *    wnd.show();
+   *  });
+   *
+   *  // Событие показывает уведомление
+   *  this.$$on('notify', (text) => {
+   *    const notifyObj = new ExampleNotification();
+   *    notifyObj.notify(text);
+   *  });
+   * }
+   *
    * @abstract
    */
   eventHandler () { }
 
   /**
-  * Called immediately after mounting
-  * child module to the root module
-  * The method must be overridden in the Root module.
+  * Абстрактный метод. Монитирование модуля. </br>
+  * Метод автоматически вызывается для каждого модуля при изменении url адреса. </br>
+  * В методе доступны объекты currentModule и currentLayout. </br>
+  * Вызывается в следующем порядке: </br>
+  * - mounted Root модуля </br>
+  * - mounted всех Global модулей в произвольном порядке </br>
+  * - mounted Layout модуля </br>
+  * - mounted Page модуля </br>
+  * - mounted Embed модулей в произвольном порядке </br>
+  * @example
+  * mounted (module, layout) {
+  *   console.log('mounted', this.constructor.name, module, layout);
+  * }
   *
-  * метод жиненого цикла , вызывается после того как модуль смотнирован,
-  * в этом методе доступен объект currentModule
+  * @param {Object} currentModule - текущий Page модуль.
+  * @param {Object} currentLayout - текущий Layout модуль.
   * @abstract
   */
   mounted () { }
 
   /**
-   * this method must be overridden by sub class.
-   * performs various actions depending on the argument
-   * @param {string} path - url.
-   * @param {Object} state - current state.
+   * Абстрактный метод. Диспетчер. </br>
+   * В этом методе должна быть описана логика модуля связанная с маршрутизацией. </br>
+   * Метод автоматически вызывается для каждого модуля при изменении url адреса. </br>
+   * Вызывается в следующем порядке: </br>
+   * - dispatcher Root модуля </br>
+   * - dispatcher всех Global модулей в произвольном порядке</br>
+   * - dispatcher Layout модуля </br>
+   * - dispatcher Page модуля </br>
+   * - dispatcher Embed модулей в произвольном порядке </br>
+   *
+   * @example
+   * dispatcher (path, state) {
+   *   console.log('dispatcher', this.constructor.name, path, state);
+   *   // Если путь my.site.com/moduleName/item/3
+   *   if (path[1] === 'item') this.showItem(state, path[2]);
+   * }
+   *
+   * @param {string} path - массив с элементами url адреса.
+   * @param {Object} state - данные переданные с url.
    * @abstract
    */
   dispatcher () { }
