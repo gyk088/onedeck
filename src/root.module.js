@@ -160,7 +160,27 @@ export default class RootModule extends Observable {
   dispatcher () { }
 
   /**
-   * @param {Object} routData - object contains url and state.
+   * В каждом модуле содержиться метод $$rout. </br>
+   * Метод необходим для реализации маршрутизации, так же может передавать данные.
+   * @example <caption>Создания события для роутинга</caption>
+   * this.$$on('onRout', (data) => this.$$rout({
+   *     path: `/module_name/item/${data.id}`,
+   *     state: data
+   *  })
+   * @example  <caption>Переход на другую страницу</caption>
+   * import Module from 'ModuleName/module.js'
+   * const module = new Module()
+   *
+   * module.$$rout({
+   *     path: '/module_name/item/1',
+   *     state: {
+   *         id: 1,
+   *         name: 'Example',
+   *         ...
+   *     },
+   *  })
+   *
+   * @param {Object} routData - Объек содержит url и state.
    * @param {string} routData.path  - url, first element module name.
    * @param {Object} routData.state - state passed from the module.
    */
@@ -185,12 +205,8 @@ export default class RootModule extends Observable {
   }
 
   /**
-  * Called immediately after mounting
-  * child module to the root module
-  * The method must be overridden in the Root module.
-  *
-  * метод жиненого цикла , вызывается после того как модуль смотнирован,
-  * в этом методе доступен объект currentModule
+  * Приватный метод вызывает методы mounted всех модулей (см описание метода mounted)
+  * @private
   */
   _mounted () {
     this.mounted(this.$$currentModule, this.$$currentLayout);
@@ -221,8 +237,8 @@ export default class RootModule extends Observable {
   }
 
   /**
-  * сurrent module destroy
-  * уничтожение текущего модуля
+  * Приватный метод вызывает метд destroy Page модуля и Embed модуле (см описание метода destroy в классе Module)
+  * @private
   */
   _destroyModule () {
     // Если переход на новый макет то чистим модуль а потом макет
@@ -236,9 +252,9 @@ export default class RootModule extends Observable {
   }
 
   /**
-  * сurrent Layout destroy
-  * уничтожение текущего макета
-  */
+   * Приватный метод вызывает метд destroy Layout модуля (см описание метода destroy в классе Module)
+   * @private
+   */
   _destroyLayout () {
     if (this.$$currentLayout.obj) {
       this.$$currentLayout.obj.destroy();
@@ -247,10 +263,10 @@ export default class RootModule extends Observable {
   }
 
   /**
-  * сurrent module dispatcher
-  * вызываем диспатчер у текущего модуля
+  * Приватный метод вызывает методы dispatcher всех модулей (см описание метода dispatcher)
   * @param {Array} path - url array
   * @param {Object} state - current state
+  * @private
   */
   _dispatcherModule (path, state) {
     this.dispatcher(path, state);
@@ -276,9 +292,11 @@ export default class RootModule extends Observable {
   }
 
   /**
-  * Get module names and data from url
+  * Приватный метод парсить текущий урл
   * получаем название модуля и данные модуля url адреса,
-  * @param {String} url - url address
+  * @param {String} url - url
+  * @returns {Arrat} массив сторк (разбитый урл адрес через / )
+  * @private
   */
   _getModuleFromUrl (url) {
     // Удалем ненужный нам путь
@@ -302,9 +320,12 @@ export default class RootModule extends Observable {
   }
 
   /**
-   * this method creates all modules object
-   * создаем все модули из конфига
-   */
+  * Приватный метод. Cоздает объект Page модуля и Embed модуля
+  * получаем название модуля и данные модуля url адреса,
+  * @param {String} moduleName - название модуля  (в конфиге параметр module)
+  * @param {Object} moduleConf - настройки модуля
+  * @private
+  */
   _createModule = async (moduleName, moduleConf) => {
     // Если уже подгрузили module - выходим
     if (this._modules[moduleName]) return;
@@ -360,8 +381,10 @@ export default class RootModule extends Observable {
   }
 
   /**
-  * this method creates all layouts object
-  * создаем все макеты из конфига
+  * Приватный метод. Cоздает объект Layout модуля
+  * получаем название модуля и данные модуля url адреса,
+  * @param {String} layoutName - название модуля  (в конфиге параметр layout)
+  * @private
   */
   _createLayout = async (layoutName) => {
     // Если уже подгрузили layout - выходим
@@ -384,8 +407,9 @@ export default class RootModule extends Observable {
   }
 
   /**
-   * this method creates a global event popstate
-   * глобальный обработчик событий
+   * Приватный метод. Содержит обработку событий popstate или hashchange. </br>
+   * Обработка события popstate или hashchange зависит от параметра в конфиге historyApi
+   * @private
    */
   _eventHandler () {
     if (this.$$config.historyApi) {
@@ -404,13 +428,14 @@ export default class RootModule extends Observable {
   }
 
   /**
-   * current module initialization
-   * инициализация текущего модуля
+   * Приватный метод инициализации модуля. </br>
+   * Инициализируем  Page Layout Embed модули в зависимости от url адресв
    * @param {Object} moduleData - initn module data.
-   * @param {string} moduleData.module - module name.
+   * @param {Array} moduleData.module - массив url адреса. В нулевом элементе module[0] содержиться имя модлуя.
    * @param {string} moduleData.path - url.
    * @param {Object} moduleData.state - current state.
    * @param {boolean} moduleData.pushState - flag indicates save to history api.
+   * @private
    */
   _initModule = async (moduleData) => {
     const moduleName = moduleData.module[0];

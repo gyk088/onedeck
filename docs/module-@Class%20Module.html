@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: Module</title>
+    <title>JSDoc: Module: @Class Module</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Module: Module</h1>
+    <h1 class="page-title">Module: @Class Module</h1>
 
     
 
@@ -90,7 +90,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="module.js.html">module.js</a>, <a href="module.js.html#line4">line 4</a>
+        <a href="module.js.html">module.js</a>, <a href="module.js.html#line7">line 7</a>
     </li></ul></dd>
     
 
@@ -220,7 +220,7 @@ module.$$gemit('eventName', data)</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="module.js.html">module.js</a>, <a href="module.js.html#line95">line 95</a>
+        <a href="module.js.html">module.js</a>, <a href="module.js.html#line98">line 98</a>
     </li></ul></dd>
     
 
@@ -276,14 +276,11 @@ module.$$gemit('eventName', data)</code></pre>
 <div class="description">
     <p>Абстрактный метод. Диспетчер. </br>
 В этом методе должна быть описана логика модуля связанная с маршрутизацией. </br>
-Метод автоматически вызывается для каждого модуля при изменении url адреса. </br>
+Метод автоматически вызывается для каждого модуля старницы при изменении url адреса. </br>
 Вызывается в следующем порядке: </br></p>
 <ul>
-<li>dispatcher Root модуля </br></li>
-<li>dispatcher всех Global модулей в произвольном порядке</br></li>
-<li>dispatcher Layout модуля </br></li>
-<li>dispatcher Page модуля </br></li>
-<li>dispatcher Embed модулей в произвольном порядке </br></li>
+<li>dispatcher Root модуля</li>
+<li>dispatcher всех Global модулей в произвольном порядке</li>
 </ul>
 </div>
 
@@ -336,7 +333,7 @@ module.$$gemit('eventName', data)</code></pre>
 
             
 
-            <td class="description last"><p>массив с элементами url адреса.</p></td>
+            <td class="description last"><p>url.</p></td>
         </tr>
 
     
@@ -359,7 +356,7 @@ module.$$gemit('eventName', data)</code></pre>
 
             
 
-            <td class="description last"><p>данные переданные с url.</p></td>
+            <td class="description last"><p>current state.</p></td>
         </tr>
 
     
@@ -400,7 +397,7 @@ module.$$gemit('eventName', data)</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="module.js.html">module.js</a>, <a href="module.js.html#line119">line 119</a>
+        <a href="module.js.html">module.js</a>, <a href="module.js.html#line112">line 112</a>
     </li></ul></dd>
     
 
@@ -427,15 +424,6 @@ module.$$gemit('eventName', data)</code></pre>
 
 
 
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>dispatcher (path, state) {
-  console.log('dispatcher', this.constructor.name, path, state);
-  // Если путь my.site.com/moduleName/item/3
-  if (path[1] === 'item') this.showItem(state, path[2]);
-}</code></pre>
 
 
 
@@ -498,7 +486,7 @@ module.$$gemit('eventName', data)</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="module.js.html">module.js</a>, <a href="module.js.html#line53">line 53</a>
+        <a href="module.js.html">module.js</a>, <a href="module.js.html#line56">line 56</a>
     </li></ul></dd>
     
 
@@ -636,7 +624,7 @@ module.$$gemit('eventName', data)</code></pre>
 
             
 
-            <td class="description last"><p>данные переданные с url.</p></td>
+            <td class="description last"><p>current state.</p></td>
         </tr>
 
     
@@ -677,7 +665,7 @@ module.$$gemit('eventName', data)</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="module.js.html">module.js</a>, <a href="module.js.html#line78">line 78</a>
+        <a href="module.js.html">module.js</a>, <a href="module.js.html#line81">line 81</a>
     </li></ul></dd>
     
 
@@ -732,17 +720,11 @@ module.$$gemit('eventName', data)</code></pre>
 
 
 <div class="description">
-    <p>Абстрактный метод. Монитирование модуля. </br>
-Метод автоматически вызывается для каждого модуля при изменении url адреса. </br>
-В методе доступны объекты currentModule и currentLayout. </br>
-Вызывается в следующем порядке: </br></p>
-<ul>
-<li>mounted Root модуля </br></li>
-<li>mounted всех Global модулей в произвольном порядке </br></li>
-<li>mounted Layout модуля </br></li>
-<li>mounted Page модуля </br></li>
-<li>mounted Embed модулей в произвольном порядке </br></li>
-</ul>
+    <p>Called immediately after mounting
+child module to the root module
+The method must be overridden in the Root module.</p>
+<p>метод жиненого цикла , вызывается после того как модуль смотнирован,
+в этом методе доступен объект currentModule и currentModule</p>
 </div>
 
 
@@ -794,7 +776,7 @@ module.$$gemit('eventName', data)</code></pre>
 
             
 
-            <td class="description last"><p>текущий Page модуль.</p></td>
+            <td class="description last"><p>текущий модуль.</p></td>
         </tr>
 
     
@@ -817,7 +799,7 @@ module.$$gemit('eventName', data)</code></pre>
 
             
 
-            <td class="description last"><p>текущий Layout модуль.</p></td>
+            <td class="description last"><p>текущий макет.</p></td>
         </tr>
 
     
@@ -858,7 +840,7 @@ module.$$gemit('eventName', data)</code></pre>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="module.js.html">module.js</a>, <a href="module.js.html#line140">line 140</a>
+        <a href="module.js.html">module.js</a>, <a href="module.js.html#line125">line 125</a>
     </li></ul></dd>
     
 
@@ -887,13 +869,6 @@ module.$$gemit('eventName', data)</code></pre>
 
 
 
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>mounted (module, layout) {
-  console.log('mounted', this.constructor.name, module, layout);
-}</code></pre>
-
-
 
         
     
@@ -911,13 +886,13 @@ module.$$gemit('eventName', data)</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Module.html">Module</a></li><li><a href="module-Observable.html">Observable</a></li><li><a href="module-RootModule.html">RootModule</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-@Class%2520Module.html">@Class Module</a></li><li><a href="module-Observable.html">Observable</a></li><li><a href="module-RootModule.html">RootModule</a></li></ul><h3>Classes</h3><ul><li><a href="module.exports.html">RootModule</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Tue Jun 16 2020 16:50:42 GMT+0300 (GMT+03:00)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Tue Jun 09 2020 01:20:55 GMT+0300 (GMT+03:00)
 </footer>
 
 <script> prettyPrint(); </script>

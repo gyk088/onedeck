@@ -45,6 +45,38 @@ Root модуль наследуется от базового класса `one
 ## Конфигурация приложения
 При старте приложнеия приосиходит инициализация модуля Root, который в свою очередь динамически импортирует необходимые модули и инициализирует их.
 
+## Alias в webpack.config
+Для того чтобы пути в модуле были относительно модуля, следуют прописать директиву [alias][alias] в `webpack.config`
+```
+  resolve: {
+    alias: {
+      ModuleName: path.resolve(__dirname, `src/modules/ModuleName`),
+      ...
+    }
+  },
+```
+#### Можно автоматизировать данную процедуру ([alias][alias] в `webpack.config`):
+```
+const { readdirSync } = require('fs')
+
+const modules = {}
+try {
+    readdirSync(path.resolve(__dirname, "src/modules/")).forEach(m => {
+        modules[m] = path.resolve(__dirname, `src/modules/${m}`)
+        console.info(`\x1b[37m Module: \x1b[33m ${m}`)
+    })
+} catch (e) {
+    console.error('\x1b[31m', e.toString())
+    process.exit()
+}
+module.exports = {
+    .....
+    resolve: {
+        alias: modules
+    }
+  },
+```
+
 #### Старт приложения (index.js):
 ```
 import Config from './conf';
@@ -55,7 +87,7 @@ new Config.rootModule(Config);
 import Root from 'Root/module';
 
 export default {
-  // роутинг с помощю history Api  или hash
+  // роутинг с помощю history Api или hash
   historyApi: false,
   // корневой путь для приложения ('/example/path/')
   rootPath: '/',
@@ -108,7 +140,7 @@ export default {
 -  **`rootModule: Class`** - класс Root модуля
 -  **`mainModule: String`** - название модуля главной старницы
 -  **`module404: String`** - название модуля старницы 404
--  **`import: Function`** - ассинхронная функция котора динамически импортирует все модули
+-  **`import: Function`** - ассинхронная функция которая динамически импортирует все модули
 -  **`modules: Object`** - объект который содержит насторйки всех модулей
 ##### Конфигурация модуля
 ```
@@ -128,6 +160,71 @@ main: {
 - **`layout: String`** - Необязательное поле. Содержит название модуля Layout. Модуль должен находиться в директории с соответсвующим названием.
 - **`embed: Object`** - Необязательное поле. Содержит Embed модули. Модуль должен находиться в директории с соответсвующим названием, которое указано в поле  `module` .
 
+## Пример Root модуля
+```
+import Onedeck from 'onedeck';
+import ExampleNotification from 'ExampleNotification/module';
+import ExampleGlobalWnd from 'ExampleGlobalWnd/module';
+
+export default class Root extends Onedeck.RootModule {
+  init (initObj) {
+    console.log('init', this.constructor.name, initObj);
+    this.eventHandler();
+  }
+
+  eventHandler () {
+    this.$$on('examplEvent', (exampleData) => {
+      this.exampleAction(exampleData);
+    });
+
+    this.$$on('showGlobalWnd', () => {
+      const wnd = new ExampleGlobalWnd();
+      wnd.show();
+    });
+
+    this.$$on('notify', (text) => {
+      const notifyObj = new ExampleNotification();
+      notifyObj.notify(text);
+    });
+  }
+
+  dispatcher (path, state) {
+    console.log('dispatcher', this.constructor.name, path, state);
+  }
+
+  mounted (module, layout) {
+    console.log('mounted', this.constructor.name, module, layout);
+  }
+}
+
+```
+**Root module** - является ядром весго приложения
+
+Модуль описывает следующие методы
+- **`init (initObj)`** - инициализация Root модуля. При инициализации нужно вызвать метод `this.eventHandler();`
+- **`eventHandler ()`** - в этом методе мы описываем все события уровня приложения (глобальные)
+```
+    this.$$on('examplEvent', (exampleData) => {
+      this.exampleAction(exampleData);
+    });
+```
+после этого объявления (`this.$$on`) в кажом модуле можно вызвать это событие  `module.$$gemit('examplEvent', data)`
+- **`dispatcher  (path, state)`** - метод вызывается при переходе на новый url адрес.
+```
+    module.$$rout({
+        path: '/module_name/item/1',
+        state: {
+            id: 1,
+            name: "Example"
+        },
+    });
+```
+каждый модуль имеет метод `$$rout`. После переходна на новый роут в каждом модуле вызывается метод `dispatcher`
+Метод  `dispatcher` принимает `path` - массив ['module_name', 'item', '1'] и `state` - `{id: 1, name: "Example"}
+- **`mounted  (module, layout)`** - метод вызывается после инициализации всех модулей.
+`mounted` принимает объекты `module` - текуший Page модуль и  `layout` - текуший Layout модуль
+
+
 [webix]: https://webix.com/
 [vue]: https://vuejs.org/
 [quasar]: https://quasar.dev/
@@ -136,3 +233,4 @@ main: {
 [mediator]: https://refactoring.guru/ru/design-patterns/mediator
 [observer]: https://refactoring.guru/ru/design-patterns/observer
 [rout]: https://developer.mozilla.org/ru/docs/Web/API/History_API
+[alias]: https://webpack.js.org/configuration/resolve/#resolvealias

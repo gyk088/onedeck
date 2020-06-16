@@ -55,9 +55,8 @@ export default class Observable {
     );
   }
 
-
   /**
-   * Отписаться от всех события
+   * Отписаться от всех событий
    * @example
    * this.$$offAll()
    */
