@@ -49,10 +49,7 @@ export default class RootModule extends Observable {
       );
 
       // вызывам метод init для модуля root
-      this.init({
-        module,
-        path: this.$$config.historyApi ? document.location.pathname : document.location.hash,
-      });
+      this.init(module);
 
       // current module initialization
       this._initModule({
@@ -70,17 +67,15 @@ export default class RootModule extends Observable {
    * Метод вызывается 1 раз при инициализации всего приложения. </br>
    *
    * @example
-   * init (initObj) {
-   *   console.log('init', this.constructor.name, initObj);
+   * init (path) {
+   *   console.log('init', this.constructor.name, path);
    *
    *   // Вызываем обработчик событий
    *   this.eventHandler();
    * }
    *
    *
-   * @param {Object} initObj - объект инициализации приложения
-   * @param {Array} initObj.module - массив с данными url адреса
-   * @param {String} initObj.path - текущий урл
+   * @param {Array} path - массив с элементами url адреса.
    * @abstract
    */
   init () { }
