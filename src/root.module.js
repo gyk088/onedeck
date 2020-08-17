@@ -44,16 +44,17 @@ export default class RootModule extends Observable {
       this._eventHandler();
 
       // получаем массив с данными из url
-      const module = this._getModuleFromUrl(
+      const urlData = this._getModuleFromUrl(
         this.$$config.historyApi ? document.location.pathname : document.location.hash,
       );
 
       // вызывам метод init для модуля root
-      this.init(module);
+      this.init(urlData.url, urlData.params);
 
       // current module initialization
       this._initModule({
-        module,
+        module: urlData.url,
+        queryParam: urlData.params,
         path: document.location.pathname,
       });
     }).catch((e) => {
@@ -185,11 +186,13 @@ export default class RootModule extends Observable {
     path = path.replace(/\/\//, '/');
     if (this.$$config.historyApi) {
       // Если используем history Api - вызываем инициализацию модуля
+      const urlData = this._getModuleFromUrl(path)
       this._initModule({
-        module: this._getModuleFromUrl(path),
+        module: urlData.url,
         path,
         state: routData.state,
         pushState: true,
+        queryParam: urlData.params,
       });
     } else {
       // Если не используем - то сохраняем состояние, и переходим по нужному пути
@@ -261,28 +264,29 @@ export default class RootModule extends Observable {
   * Приватный метод вызывает методы dispatcher всех модулей (см описание метода dispatcher)
   * @param {Array} path - url array
   * @param {Object} state - current state
+  * @param {Object} queryParam - параметры переданные вместе с url
   * @private
   */
-  _dispatcherModule (path, state) {
-    this.dispatcher(path, state);
+  _dispatcherModule (path, state, queryParam) {
+    this.dispatcher(path, state, queryParam);
     // Вызываем диспатчеры для глобальных модулей
     Object.keys(this._modules)
       .filter((moduleName) => this._modules[moduleName].$$global)
       .forEach((moduleName) => {
-        this._modules[moduleName].dispatcher(path, state);
+        this._modules[moduleName].dispatcher(path, state, queryParam);
 
         // Встроенные модули
         Object.keys(this._modules[moduleName].$$embed)
           .forEach((name) => this._modules[moduleName].$$embed[name]
-            .dispatcher(path, state));
+            .dispatcher(path, state, queryParam));
       });
     // Если переход на новый макет то чистим модуль а потом макет
     if (this.$$currentModule.obj) {
       // Вызываем диспатчер для текущего модуля
-      this.$$currentModule.obj.dispatcher(path, state);
+      this.$$currentModule.obj.dispatcher(path, state, queryParam);
       // Вызываем диспатчеры для всторенных модулей
       Object.keys(this.$$currentModule.obj.$$embed)
-        .forEach((name) => this.$$currentModule.obj.$$embed[name].dispatcher(path, state));
+        .forEach((name) => this.$$currentModule.obj.$$embed[name].dispatcher(path, state, queryParam));
     }
   }
 
@@ -301,7 +305,20 @@ export default class RootModule extends Observable {
     // Удалем первый '/' и #
     url = url.replace(/^[\/, #]/, '');
 
-    return url.split('/');
+    const [urlParam, queryParam] = url.split('?')
+    const params = {}
+
+    if (queryParam) {
+      queryParam.split('&').forEach(param => {
+        const [key, val] = param.split('=')
+        params[key] = val
+      })
+    }
+
+    return {
+      url: urlParam.split('/'),
+      params
+    }
   }
 
   _initGlobalModules = async () => {
@@ -408,16 +425,20 @@ export default class RootModule extends Observable {
    */
   _eventHandler () {
     if (this.$$config.historyApi) {
+      const urlData = this._getModuleFromUrl(document.location.pathname)
       window.addEventListener('popstate', (event) => this._initModule({
-        module: this._getModuleFromUrl(document.location.pathname),
+        module: urlData.url,
         path: document.location.pathname,
         state: event.state,
+        queryParam: urlData.params
       }));
     } else {
+      const urlData = this._getModuleFromUrl(document.location.hash)
       window.addEventListener('hashchange', () => this._initModule({
-        module: this._getModuleFromUrl(document.location.hash),
+        module: urlData.url,
         path: document.location.hash,
         state: this._urlState[document.location.hash.replace(/^#/, '')],
+        queryParam: urlData.params
       }));
     }
   }
@@ -427,6 +448,7 @@ export default class RootModule extends Observable {
    * Инициализируем  Page Layout Embed модули в зависимости от url адресв
    * @param {Object} moduleData - initn module data.
    * @param {Array} moduleData.module - массив url адреса. В нулевом элементе module[0] содержиться имя модлуя.
+   * @param {Object} moduleData.queryParam - данные передданые в url.
    * @param {string} moduleData.path - url.
    * @param {Object} moduleData.state - current state.
    * @param {boolean} moduleData.pushState - flag indicates save to history api.
@@ -467,7 +489,7 @@ export default class RootModule extends Observable {
       && mudules[moduleName].layout === this.$$currentLayout.name
     ) {
       // Если переход внутри текущего макета
-      this.$$currentLayout.obj.dispatcher(moduleData.module, moduleData.state);
+      this.$$currentLayout.obj.dispatcher(moduleData.module, moduleData.state, moduleData.queryParam);
     } else if (mudules[moduleName].layout) {
       this._destroyModule();
       this._destroyLayout();
@@ -485,7 +507,7 @@ export default class RootModule extends Observable {
       };
 
       // Инициализируем новый макет (вызываем метод init)
-      this.$$currentLayout.obj.init(moduleData.module, moduleData.state);
+      this.$$currentLayout.obj.init(moduleData.module, moduleData.state, moduleData.queryParam);
     } else {
       // Если у модуля нет макета - уничтожаем текущий макет
       this._destroyModule();
@@ -498,7 +520,7 @@ export default class RootModule extends Observable {
       && this.$$currentModule.name === moduleName
     ) {
       // Если переход внутри текущего модуля - вызываем диспатчер модуля (метода dispatcher)
-      this._dispatcherModule(moduleData.module, moduleData.state);
+      this._dispatcherModule(moduleData.module, moduleData.state, moduleData.queryParam);
     } else {
       // Если переход на новый модуль - вызываем деструктор текущего модуля (метод destroy)
       this._destroyModule();
@@ -517,13 +539,13 @@ export default class RootModule extends Observable {
       };
 
       // Инициализируем новый модуль (вызываем метод init)
-      this.$$currentModule.obj.init(moduleData.module, moduleData.state);
+      this.$$currentModule.obj.init(moduleData.module, moduleData.state, moduleData.queryParam);
       // Инициализируем встроенные модули
       Object.keys(this.$$currentModule.obj.$$embed)
         .forEach((name) => this.$$currentModule.obj.$$embed[name]
-          .init(moduleData.module, moduleData.state));
+          .init(moduleData.module, moduleData.state, moduleData.queryParam));
 
-      this._dispatcherModule(moduleData.module, moduleData.state);
+      this._dispatcherModule(moduleData.module, moduleData.state, moduleData.queryParam);
     }
 
     // Если используем history api - сохраняем новое состояние в истоии браузера
