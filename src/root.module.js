@@ -425,21 +425,26 @@ export default class RootModule extends Observable {
    */
   _eventHandler () {
     if (this.$$config.historyApi) {
-      const urlData = this._getModuleFromUrl(document.location.pathname)
-      window.addEventListener('popstate', (event) => this._initModule({
-        module: urlData.url,
-        path: document.location.pathname,
-        state: event.state,
-        queryParam: urlData.params
-      }));
+
+      window.addEventListener('popstate', (event) => {
+        const urlData = this._getModuleFromUrl(document.location.pathname)
+        this._initModule({
+          module: urlData.url,
+          path: document.location.pathname,
+          state: event.state,
+          queryParam: urlData.params
+        })
+      });
     } else {
-      const urlData = this._getModuleFromUrl(document.location.hash)
-      window.addEventListener('hashchange', () => this._initModule({
-        module: urlData.url,
-        path: document.location.hash,
-        state: this._urlState[document.location.hash.replace(/^#/, '')],
-        queryParam: urlData.params
-      }));
+      window.addEventListener('hashchange', () => {
+        const urlData = this._getModuleFromUrl(document.location.hash)
+        this._initModule({
+          module: urlData.url,
+          path: document.location.hash,
+          state: this._urlState[document.location.hash.replace(/^#/, '')],
+          queryParam: urlData.params
+        })
+      });
     }
   }
 
