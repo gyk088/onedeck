@@ -156,10 +156,10 @@ export default class RootModule extends Observable {
   dispatcher () { }
 
   /**
-   * В каждом модуле содержиться метод $$rout. </br>
+   * В каждом модуле содержиться метод $$route. </br>
    * Метод необходим для реализации маршрутизации, так же может передавать данные.
    * @example <caption>Создания события для роутинга</caption>
-   * this.$$on('onRout', (data) => this.$$rout({
+   * this.$$on('onroute', (data) => this.$$route({
    *     path: `/module_name/item/${data.id}`,
    *     state: data
    *  })
@@ -167,7 +167,7 @@ export default class RootModule extends Observable {
    * import Module from 'ModuleName/module.js'
    * const module = new Module()
    *
-   * module.$$rout({
+   * module.$$route({
    *     path: '/module_name/item/1',
    *     state: {
    *         id: 1,
@@ -176,12 +176,12 @@ export default class RootModule extends Observable {
    *     },
    *  })
    *
-   * @param {Object} routData - Объек содержит url и state.
-   * @param {string} routData.path  - url, first element module name.
-   * @param {Object} routData.state - state passed from the module.
+   * @param {Object} routeData - Объек содержит url и state.
+   * @param {string} routeData.path  - url, first element module name.
+   * @param {Object} routeData.state - state passed from the module.
    */
-  $$rout (routData) {
-    let path = this.$$config.rootPath ? this.$$config.rootPath + routData.path : routData.path;
+  $$route (routeData) {
+    let path = this.$$config.rootPath ? this.$$config.rootPath + routeData.path : routeData.path;
     // Удалем двойные '//'
     path = path.replace(/\/\//, '/');
     if (this.$$config.historyApi) {
@@ -190,14 +190,14 @@ export default class RootModule extends Observable {
       this._initModule({
         module: urlData.url,
         path,
-        state: routData.state,
+        state: routeData.state,
         pushState: true,
         queryParam: urlData.params,
       });
     } else {
       // Если не используем - то сохраняем состояние, и переходим по нужному пути
       // Далее вызовится событие "hashchange" - в котором и произойдет вызов метода initModule
-      this._urlState[path] = routData.state;
+      this._urlState[path] = routeData.state;
       document.location.hash = path;
     }
   }
@@ -352,8 +352,8 @@ export default class RootModule extends Observable {
     this._modules[moduleName] = new ModuleClass();
     // глобальный модуль
     this._modules[moduleName].$$global = moduleConf.global;
-    // добавляем метод rout для маршрутизации
-    this._modules[moduleName].$$rout = this.$$rout.bind(this);
+    // добавляем метод route для маршрутизации
+    this._modules[moduleName].$$route = this.$$route.bind(this);
     // добавляем метод  publish для публикации глобальных событий
     this._modules[moduleName].$$gemit = this.$$emit.bind(this);
     // конфиг
@@ -375,7 +375,7 @@ export default class RootModule extends Observable {
         EmbedClass = EmbedClass.default;
 
         this._modules[moduleName].$$embed[embedNames[i]] = new EmbedClass();
-        this._modules[moduleName].$$embed[embedNames[i]].$$rout = this.$$rout.bind(this);
+        this._modules[moduleName].$$embed[embedNames[i]].$$route = this.$$route.bind(this);
         this._modules[moduleName].$$embed[embedNames[i]].$$gemit = this.$$emit.bind(this);
         this._modules[moduleName].$$embed[embedNames[i]].$$config = this.$$config;
       }
@@ -410,8 +410,8 @@ export default class RootModule extends Observable {
 
     // создаем макет
     this._layouts[layoutName] = new LayoutClass();
-    // добавляем метод rout для маршрутизации
-    this._layouts[layoutName].$$rout = this.$$rout.bind(this);
+    // добавляем метод route для маршрутизации
+    this._layouts[layoutName].$$route = this.$$route.bind(this);
     // добавляем метод  publish для публикации глобальных событий
     this._layouts[layoutName].$$gemit = this.$$emit.bind(this);
     // конфиг
@@ -465,14 +465,14 @@ export default class RootModule extends Observable {
     const mudules = this.$$config.modules;
 
     if (!moduleName) {
-      this.$$rout({
+      this.$$route({
         path: this.$$config.mainModule,
       });
       return;
     }
 
     if (!mudules[moduleName]) {
-      this.$$rout({
+      this.$$route({
         path: this.$$config.module404,
       });
       console.error('no such module:', moduleName);
@@ -481,7 +481,7 @@ export default class RootModule extends Observable {
 
     // Если это глобальный или встраиваемый модуль - они не учавствует в роутинге
     if (mudules[moduleName].global) {
-      this.$$rout({
+      this.$$route({
         path: this.$$config.module404,
       });
       console.error('global module:', moduleName);
