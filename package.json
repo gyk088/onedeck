@@ -1,6 +1,6 @@
 {
   "name": "onedeck",
-  "version": "1.0.1",
+  "version": "1.1.1",
   "description": "onedeck - a front-end microseeding development framework",
   "main": "onedeck.js",
   "scripts": {

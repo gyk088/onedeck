@@ -17,7 +17,7 @@ export default class Observable {
    * @param {string} channel - название события.
    * @param {function} cb - callback функция.
    */
-  $$on (channel, cb) {
+  $$on(channel, cb) {
     if (!this._listeners[channel]) {
       this._listeners[channel] = {};
       this._listeners[channel].eventProperty = {};
@@ -36,7 +36,7 @@ export default class Observable {
    * @param {string} channel - название события.
    * @param {function} cb - callback функция.
    */
-  $$onOnce (channel, cb) {
+  $$onOnce(channel, cb) {
     this.on(channel, cb);
     this._listeners[channel].eventProperty.isOnOnce = true;
   }
@@ -49,7 +49,7 @@ export default class Observable {
    * @param {string} channel - название события.
    * @param {function} cb - callback функция.
    */
-  $$off (channel, cb) {
+  $$off(channel, cb) {
     this._listeners[channel].data = this._listeners[channel].data.filter(
       (listener) => listener !== cb,
     );
@@ -60,8 +60,8 @@ export default class Observable {
    * @example
    * this.$$offAll()
    */
-  $$offAll () {
-    this._listeners = {}
+  $$offAll() {
+    this._listeners = {};
   }
 
   /**
@@ -72,7 +72,7 @@ export default class Observable {
    * @param {string} channel - название события.
    * @param {Object} data - данные события.
    */
-  $$emit (channel, data) {
+  $$emit(channel, data) {
     if (!this._listeners[channel] || !this._listeners[channel].data) {
       console.error('No such event:', channel);
       return;
@@ -94,7 +94,7 @@ export default class Observable {
    *
    * @param {Object} extendObj - объект который необходимо расширть
    */
-  install (extendObj) {
+  install(extendObj) {
     extendObj._listeners = this._listeners;
     extendObj.$$on = this.$$on;
     extendObj.$$off = this.$$off;

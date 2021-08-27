@@ -50,7 +50,7 @@ export default class Module extends Observable {
    * }
    * @abstract
    */
-  eventHandler () { }
+  eventHandler() { }
 
   /**
    * Абстрактный метод. Инициализация приложения модуля. </br>
@@ -75,7 +75,7 @@ export default class Module extends Observable {
    * @param {Object} state - данные переданные с url.
    * @abstract
    */
-  init () { }
+  init() { }
 
   /**
    * Абстрактный метод. Деструктор. </br>
@@ -92,7 +92,7 @@ export default class Module extends Observable {
    * }
    * @abstract
    */
-  destroy () { }
+  destroy() { }
 
   /**
    * Абстрактный метод. Диспетчер. </br>
@@ -116,7 +116,7 @@ export default class Module extends Observable {
    * @param {Object} state - данные переданные с url.
    * @abstract
    */
-  dispatcher () { }
+  dispatcher() { }
 
   /**
   * Абстрактный метод. Монитирование модуля. </br>
@@ -137,5 +137,5 @@ export default class Module extends Observable {
   * @param {Object} currentLayout - текущий Layout модуль.
   * @abstract
   */
-  mounted () { }
+  mounted() { }
 }
